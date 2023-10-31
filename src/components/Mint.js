@@ -61,6 +61,26 @@ function Mint({ children }) {
         }
     }, [wallet]);
 
+    const createScript = useCallback(async (label, network, signers) => {
+        try {
+            const response = await fetch('http://localhost:8000/createScript', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    label,
+                    network,
+                    signers: signers.map(s => s.address)
+                }),
+            });
+            const script = await response.json();
+            return script;
+        } catch (error) {
+            return null
+        }
+    }, [wallet]);
+
     const getUtxos = async (wallet, tokensLength) => {
         const amount = toLovelace(tokensLength * 5);
         const encode = cborEncode(cardanoRef.current, amount);
@@ -78,12 +98,13 @@ function Mint({ children }) {
 
     const mintValue = useMemo(() => ({
         wallet,
-        txInfo, 
+        txInfo,
         setWallet,
         setTxInfo,
         buildTx,
         signTx,
-    }), [wallet, txInfo, setWallet, setTxInfo, buildTx, signTx])
+        createScript
+    }), [wallet, txInfo, setWallet, setTxInfo, buildTx, signTx, createScript])
 
     async function loadCardano() {
         await Cardano.load();
