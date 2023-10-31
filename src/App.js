@@ -15,6 +15,8 @@ import BuildTx from './components/BuildTx';
 import WalletConnector from './components/WalletConnector';
 import Mint from './components/Mint';
 import SignTx from './components/SignTx';
+import CreateScript from './components/CreateScript';
+import SetUp from './components/Setup';
 
 
 const MintContext = createContext({});
@@ -75,7 +77,8 @@ function App() {
                   footer={<Footer />}
                   wrapper={<Wrapper />}
                 >
-                  {/* <CreateScript /> */}
+                  <SetUp />
+                  <CreateScript />
                   <BuildTx />
                   <SignTx />
                 </Wizard>
@@ -89,11 +92,14 @@ function App() {
 }
 
 const steps = [
-  // {
-  //   title: 'Create script'
-  // },
   {
-    title: 'Build Tx'
+    title: 'Setup'
+  },
+  {
+    title: 'Create script'
+  },
+  {
+    title: 'Mint NFT'
   },
   {
     title: 'Sign Tx'
@@ -117,14 +123,15 @@ const Header = () => {
 
 const Wrapper = ({ children }) => <div className='step-container'>{children}</div>
 const Footer = () => {
-  const { previousStep, nextStep } = useWizard();
+  const { isFirstStep, previousStep, nextStep } = useWizard();
 
   return (
-    <div className='footer pb-5'>
-      <Button onClick={previousStep} className='btn-secondary'>Previous</Button>
-      <Button onClick={nextStep} className='btn-success m-1'>Next</Button>
-      {/* <button onClick={() => nextStep()}>Next ⏭</button> */}
-    </div>
+    <>
+      {!isFirstStep && <div className='footer pb-5'>
+        <Button onClick={previousStep} className='btn-secondary'>Previous</Button>
+        <Button onClick={nextStep} className='btn-primary m-1'>Next</Button>
+      </div>}
+    </>
   )
 }
 

@@ -91,7 +91,7 @@ const BuildTx = () => {
                 <button type="button" className="btn btn-success m-1 p-1 pb-0 pt-0" onClick={() => downloadJsonFile(txInfo, 'tx-info')}>
                     <i className="bi bi-arrow-down-circle"></i>
                 </button>
-                <textarea className="form-control" id="exampleFormControlTextarea1" rows="3" disabled={true} value={JSON.stringify(txInfo, null, 2)} style={{ 'minHeight': '400px', 'maxHeight': '600px' }}></textarea>
+                <textarea className="form-control" id="exampleFormControlTextarea1" rows="3" disabled={true} value={JSON.stringify(txInfo, null, 2)} style={{ 'minHeight': '300px', 'maxHeight': '400px' }}></textarea>
             </div>
         </>
     )
