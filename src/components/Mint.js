@@ -5,32 +5,8 @@ import { cborDecode, cborEncode, getAddress, getSignersCollateral, getSignersUtx
 
 function Mint({ children }) {
     const [wallet, setCurrentWallet] = useState(null);
+    const [txInfo, setTxInfo] = useState({ tx: '' });
     const cardanoRef = useRef(null);
-    const scriptSigners = useRef(new Set());
-    const inputSigners = useRef(new Set());
-    const tx = useRef(null);
-
-    const setScriptSigners = useCallback((signers) => {
-        const set = new Set();
-        console.log('Script Signers:', signers);
-        for (const signer of signers) {
-            set.add(signer);
-        }
-        scriptSigners.current = set;
-        tx.current = null;
-        console.log('Tx Script Signers', scriptSigners.current);
-    }, []);
-
-    const setInputSigners = (signers) => {
-        const set = new Set();
-        console.log('Inputs Signers:', signers);
-        for (const signer of signers) {
-            set.add(signer);
-        }
-        inputSigners.current = set;
-        console.log('Tx Inputs Signers', inputSigners.current);
-    };
-
 
     const setWallet = useCallback(async (wallet) => {
         try {
@@ -51,7 +27,7 @@ function Mint({ children }) {
 
     const signTx = useCallback(async (tx, partial = true) => {
         const signature = await wallet.api.signTx(tx, partial);
-        return rebuildTx(cardanoRef.current, tx, signature, (scriptSigners.current.size == 0 ? null : scriptSigners.current))
+        return rebuildTx(cardanoRef.current, tx, signature)
     }, [wallet]);
 
     const buildTx = useCallback(async (script, tokens) => {
@@ -73,15 +49,15 @@ function Mint({ children }) {
             });
             const _txInfo = await response.json();
             if (_txInfo && !_txInfo.error) {
-                tx.current = await signTx(_txInfo.tx);
-                return { tx: tx.current };
+                const tx = await signTx(_txInfo.tx);
+                return tx;
             } else {
                 console.log('Error', _txInfo);
-                return null;
+                return '';
             }
         } catch (error) {
             console.log('Error', error);
-            return null
+            return '';
         }
     }, [wallet]);
 
@@ -102,10 +78,12 @@ function Mint({ children }) {
 
     const mintValue = useMemo(() => ({
         wallet,
+        txInfo, 
         setWallet,
+        setTxInfo,
         buildTx,
         signTx,
-    }), [wallet, setWallet, buildTx, signTx])
+    }), [wallet, txInfo, setWallet, setTxInfo, buildTx, signTx])
 
     async function loadCardano() {
         await Cardano.load();

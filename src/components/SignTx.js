@@ -1,12 +1,10 @@
 import { useState } from "react";
 import useMint from "../UseMint";
 import { Button, DropdownButton } from "react-bootstrap";
-import { onFiletSelected } from "../utils";
+import { downloadJsonFile, onFiletSelected } from "../utils";
 
 const SignTx = () => {
-    const { signTx } = useMint();
-
-    const [txInfo, setTxInfo] = useState({ tx: '' });
+    const { txInfo, setTxInfo, signTx } = useMint();
 
     const onScriptSelected = (data) => {
         const _tx = JSON.parse(data);
@@ -15,9 +13,8 @@ const SignTx = () => {
 
     const _signTx = async () => {
         try {
-            const { tx } = txInfo;
-            const signedTx = await signTx(tx, true);
-            setTxInfo({ tx: signedTx });
+            const tx = await signTx(txInfo.tx, true);
+            setTxInfo({ tx });
         } catch (e) {
             console.log('Error', e);
         }
@@ -63,7 +60,10 @@ const SignTx = () => {
                 }
             </div> */}
             <div className="mb-3">
-                {/* <label htmlFor="exampleFormControlTextarea1" className="form-label">Tx</label> */}
+                <label htmlFor="exampleFormControlTextarea1" className="form-label">Tx Info</label>
+                <button type="button" className="btn btn-success m-1 p-1 pb-0 pt-0" onClick={() => downloadJsonFile(txInfo, 'tx-info')}>
+                    <i className="bi bi-arrow-down-circle"></i>
+                </button>
                 <textarea className="form-control" id="exampleFormControlTextarea1" rows="3" disabled={true} value={JSON.stringify(txInfo, null, 2)} style={{ 'minHeight': '400px', 'maxHeight': '600px' }}></textarea>
             </div>
         </>

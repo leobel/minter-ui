@@ -5,11 +5,10 @@ import { downloadJsonFile } from "../utils";
 
 const BuildTx = () => {
     const { nextStep } = useWizard();
-    const { wallet, buildTx } = useMint();
+    const { wallet, txInfo, setTxInfo, buildTx } = useMint();
 
     const [script, setScript] = useState(null);
     const [tokens, setTokens] = useState([{ address: '', token: null }]);
-    const [txInfo, setTxInfo] = useState({ tx: ''});
 
     const onFiletSelected = (e, cb) => {
         const file = e.target.files[0];
@@ -50,8 +49,8 @@ const BuildTx = () => {
     }
 
     const onBuildTx = async () => {
-        const _txInfo = await buildTx(script, tokens);
-        setTxInfo(_txInfo);
+        const tx = await buildTx(script, tokens);
+        setTxInfo({ tx });
     }
 
     return (
