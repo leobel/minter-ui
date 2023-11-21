@@ -78,10 +78,11 @@ const UpdateToken = () => {
                         </div>
                     )
                 })}
-                <button type="button" className="btn btn-link p-0" onClick={addToken}>
+                {/* TODO: allow update multiple tokens at once */}
+                {/* <button type="button" className="btn btn-link p-0" onClick={addToken}>
                     <i className='bi bi-plus-circle-fill'></i>
                     Add more
-                </button>
+                </button> */}
             </div>
 
             <button className='btn btn-primary mt-4 mb-4' onClick={onUpdateToken} disabled={!wallet || (tokens.length == 0 || tokens.some(t => (!t.asset_name || !t.metadata))) || !script}>BuildTx</button>
