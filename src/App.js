@@ -2,12 +2,13 @@ import './App.css';
 
 import { Wizard, useWizard } from 'react-use-wizard';
 import Button from 'react-bootstrap/Button';
-import BuildTx from './components/BuildTx';
+import MintToken from './components/MintToken';
 import WalletConnector from './components/WalletConnector';
 import Mint from './components/Mint';
 import SignTx from './components/SignTx';
 import CreateScript from './components/CreateScript';
 import SetUp from './components/Setup';
+import UpdateToken from './components/UpdateToken';
 
 
 
@@ -26,7 +27,8 @@ function App() {
               >
                 <SetUp />
                 <CreateScript />
-                <BuildTx />
+                <MintToken />
+                <UpdateToken />
                 <SignTx />
               </Wizard>
             </div>
@@ -46,6 +48,9 @@ const steps = [
   },
   {
     title: 'Mint NFT'
+  },
+  {
+    title: 'Update NFT'
   },
   {
     title: 'Sign Tx'

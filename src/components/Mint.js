@@ -30,11 +30,11 @@ function Mint({ children }) {
         return rebuildTx(cardanoRef.current, tx, signature)
     }, [wallet]);
 
-    const buildTx = useCallback(async (script, tokens) => {
+    const mintToken = useCallback(async (script, tokens) => {
         try {
             const payments = await getUtxos(wallet, tokens.length);
             const collaterals = await getCollateral(wallet);
-            const response = await fetch('http://localhost:8000/buildTx', {
+            const response = await fetch('http://localhost:8000/mintToken', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -42,6 +42,37 @@ function Mint({ children }) {
                 body: JSON.stringify({
                     script,
                     tokens: tokens.reduce((dict, { address, token }) => ({ ...dict, [address]: (dict[address] || []).concat([token]) }), {}),
+                    payments,
+                    collaterals,
+                    change_address: wallet.address
+                }),
+            });
+            const _txInfo = await response.json();
+            if (_txInfo && !_txInfo.error) {
+                const tx = await signTx(_txInfo.tx);
+                return tx;
+            } else {
+                console.log('Error', _txInfo);
+                return '';
+            }
+        } catch (error) {
+            console.log('Error', error);
+            return '';
+        }
+    }, [wallet]);
+
+    const updateToken = useCallback(async (script, tokens) => {
+        try {
+            const payments = await getUtxos(wallet, tokens.length);
+            const collaterals = await getCollateral(wallet);
+            const response = await fetch('http://localhost:8000/updateToken', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    script,
+                    tokens: tokens,
                     payments,
                     collaterals,
                     change_address: wallet.address
@@ -89,8 +120,9 @@ function Mint({ children }) {
     };
 
     const getCollateral = async (wallet) => {
-        const amount = toLovelace(5);
+        const amount = toLovelace(10);
         const api = wallet.api.getCollateral ? wallet.api : wallet.api.experimental;
+        console.log('Collateral amount to ask:', cborEncode(cardanoRef.current, amount));
         const collaterals = await api.getCollateral(cborEncode(cardanoRef.current, amount));
         return collaterals;
     };
@@ -101,10 +133,11 @@ function Mint({ children }) {
         txInfo,
         setWallet,
         setTxInfo,
-        buildTx,
+        mintToken,
+        updateToken,
         signTx,
         createScript
-    }), [wallet, txInfo, setWallet, setTxInfo, buildTx, signTx, createScript])
+    }), [wallet, txInfo, setWallet, setTxInfo, mintToken, updateToken, signTx, createScript])
 
     async function loadCardano() {
         await Cardano.load();

@@ -3,12 +3,12 @@ import { useWizard } from 'react-use-wizard';
 import useMint from "../UseMint";
 import { downloadJsonFile } from "../utils";
 
-const BuildTx = () => {
+const UpdateToken = () => {
     const { nextStep } = useWizard();
-    const { wallet, txInfo, setTxInfo, buildTx } = useMint();
+    const { wallet, txInfo, setTxInfo, updateToken } = useMint();
 
     const [script, setScript] = useState(null);
-    const [tokens, setTokens] = useState([{ address: '', token: null }]);
+    const [tokens, setTokens] = useState([{ asset_name: '', metadata: null }]);
 
     const onFiletSelected = (e, cb) => {
         const file = e.target.files[0];
@@ -21,35 +21,35 @@ const BuildTx = () => {
     }
 
     const onScriptSelected = (data) => {
-        const { policy_id, policy, signers, reference_address, mint } = JSON.parse(data);
-        const _script = { policy_id, policy, signers, reference_address, mint };
+        const { policy_id, policy, signers, reference_address, reference } = JSON.parse(data);
+        const _script = { policy_id, policy, signers, reference_address, reference };
         setScript(_script);
     }
 
-    const onTokenSelected = (i, address) => {
+    const onTokenSelected = (i, asset_name) => {
         return (data) => {
-            const token = JSON.parse(data);
+            const metadata = JSON.parse(data);
             const _tokens = [...tokens];
-            _tokens[i] = { address, token };
+            _tokens[i] = { asset_name, metadata };
             setTokens(_tokens);
         }
     }
 
-    const onAddressChange = (e, i) => {
-        const addr = e.target.value;
-        setTokens(tokens.map((t, index) => index == i ? { ...t, address: addr } : t));
+    const onAssetChange = (e, i) => {
+        const asset_name = e.target.value;
+        setTokens(tokens.map((t, index) => index == i ? { ...t, asset_name } : t));
     }
 
     const addToken = () => {
-        setTokens(tokens.concat([{ address: '', token: null }]));
+        setTokens(tokens.concat([{ asset_name: '', metadata: null }]));
     }
 
     const removeToken = (i) => {
         setTokens(tokens.slice(0, i).concat(tokens.slice(i + 1)));
     }
 
-    const onBuildTx = async () => {
-        const tx = await buildTx(script, tokens);
+    const onUpdateToken = async () => {
+        const tx = await updateToken(script, tokens);
         setTxInfo({ tx });
     }
 
@@ -66,9 +66,9 @@ const BuildTx = () => {
                     return (
                         <div className='row' key={i}>
                             <div className="col-12 input-group mb-3">
-                                <label className="input-group-text">Address</label>
-                                <input type="text" className="form-control" placeholder='addr...' value={t.address} onChange={(e) => onAddressChange(e, i)} />
-                                <input type="file" className="form-control" onChange={(e) => onFiletSelected(e, onTokenSelected(i, t.address))} />
+                                <label className="input-group-text">Asset</label>
+                                <input type="text" className="form-control" placeholder='asset...' value={t.asset_name} onChange={(e) => onAssetChange(e, i)} />
+                                <input type="file" className="form-control" onChange={(e) => onFiletSelected(e, onTokenSelected(i, t.asset_name))} />
                                 <button type="button" className="btn btn-danger p-3 pb-0 pt-0" onClick={() => removeToken(i)}>
                                     <i className="bi bi-trash"></i>
                                 </button>
@@ -84,7 +84,7 @@ const BuildTx = () => {
                 </button>
             </div>
 
-            <button className='btn btn-primary mt-4 mb-4' onClick={onBuildTx} disabled={!wallet || (tokens.length == 0 || tokens.some(t => (!t.address || !t.token))) || !script}>BuildTx</button>
+            <button className='btn btn-primary mt-4 mb-4' onClick={onUpdateToken} disabled={!wallet || (tokens.length == 0 || tokens.some(t => (!t.asset_name || !t.metadata))) || !script}>BuildTx</button>
 
             <div className="mb-3">
                 <label htmlFor="exampleFormControlTextarea1" className="form-label">Tx Info </label>
@@ -97,4 +97,4 @@ const BuildTx = () => {
     )
 }
 
-export default BuildTx;
+export default UpdateToken;
