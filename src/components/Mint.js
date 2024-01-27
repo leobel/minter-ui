@@ -92,6 +92,37 @@ function Mint({ children }) {
         }
     }, [wallet]);
 
+    const burnToken = useCallback(async (script, tokens) => {
+        try {
+            const payments = await getUtxos(wallet, tokens.length);
+            const collaterals = await getCollateral(wallet);
+            const response = await fetch('http://localhost:8000/burnToken', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    script,
+                    tokens: tokens,
+                    payments,
+                    collaterals,
+                    change_address: wallet.address
+                }),
+            });
+            const _txInfo = await response.json();
+            if (_txInfo && !_txInfo.error) {
+                const tx = await signTx(_txInfo.tx);
+                return tx;
+            } else {
+                console.log('Error', _txInfo);
+                return '';
+            }
+        } catch (error) {
+            console.log('Error', error);
+            return '';
+        }
+    }, [wallet]);
+
     const createScript = useCallback(async (label, network, signers) => {
         try {
             const response = await fetch('http://localhost:8000/createScript', {
@@ -135,9 +166,10 @@ function Mint({ children }) {
         setTxInfo,
         mintToken,
         updateToken,
+        burnToken,
         signTx,
         createScript
-    }), [wallet, txInfo, setWallet, setTxInfo, mintToken, updateToken, signTx, createScript])
+    }), [wallet, txInfo, setWallet, setTxInfo, mintToken, updateToken, burnToken, signTx, createScript])
 
     async function loadCardano() {
         await Cardano.load();

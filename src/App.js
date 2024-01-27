@@ -9,8 +9,7 @@ import SignTx from './components/SignTx';
 import CreateScript from './components/CreateScript';
 import SetUp from './components/Setup';
 import UpdateToken from './components/UpdateToken';
-
-
+import BurnToken from './components/BurnToken';
 
 function App() {
   return (
@@ -29,6 +28,7 @@ function App() {
                 <CreateScript />
                 <MintToken />
                 <UpdateToken />
+                <BurnToken />
                 <SignTx />
               </Wizard>
             </div>
@@ -51,6 +51,9 @@ const steps = [
   },
   {
     title: 'Update NFT'
+  },
+  {
+    title: 'Burn NFT'
   },
   {
     title: 'Sign Tx'
